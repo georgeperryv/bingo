@@ -1,0 +1,59 @@
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const phrases = require('./phrases.json');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+// Simple endpoint to retrieve all phrases
+app.get('/api/phrases', (req, res) => {
+  res.json(phrases);
+});
+
+// Endpoint to generate a bingo card layout from selected phrases
+app.post('/api/generate', (req, res) => {
+  const { selectedPhrases } = req.body; // array of 24 user-selected phrases
+
+  if (!Array.isArray(selectedPhrases) || selectedPhrases.length !== 24) {
+    return res.status(400).json({ error: 'Exactly 24 phrases must be selected.' });
+  }
+
+  // Shuffle the selected phrases
+  const shuffled = shuffleArray(selectedPhrases);
+
+  // Construct 5x5 grid, center cell is a FREE space
+  const bingoGrid = [];
+  let index = 0;
+  for (let row = 0; row < 5; row++) {
+    const rowArray = [];
+    for (let col = 0; col < 5; col++) {
+      if (row === 2 && col === 2) {
+        // Center cell
+        rowArray.push("FREE");
+      } else {
+        rowArray.push(shuffled[index]);
+        index++;
+      }
+    }
+    bingoGrid.push(rowArray);
+  }
+
+  res.json({ bingoGrid });
+});
+
+// Helper function to shuffle an array
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
