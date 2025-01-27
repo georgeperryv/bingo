@@ -1,4 +1,4 @@
-/* Container for the entire app */
+/* Container for entire app */
 .container {
   display: flex;
   flex-direction: column;
@@ -7,55 +7,70 @@
   margin: 20px;
 }
 
-/* Panel that lists all phrases */
-.phrases-panel {
-  width: 300px;
+/* Manage Panel */
+.manage-panel {
+  width: 500px;
+  border: 1px solid #ccc;
+  padding: 10px 20px;
   margin-bottom: 20px;
 }
 
-.phrases-list {
-  max-height: 300px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  padding: 10px;
+.manage-panel h2 {
+  margin-top: 0;
 }
 
-.phrase-item {
-  margin-bottom: 8px;
+.add-phrase-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.btn-generate {
+.manage-phrase-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.phrase-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.phrase-text {
+  width: 200px;
+  display: inline-block;
+}
+
+/* Selected Info and Generate Button */
+.selected-info {
   margin-top: 10px;
-  padding: 8px 16px;
-  cursor: pointer;
+  text-align: right;
 }
 
-/* Panel that shows the Bingo card */
+/* Bingo Panel and Table */
 .bingo-panel {
   margin-top: 20px;
 }
 
-/* Bingo Card Layout */
-.bingo-card {
-  display: inline-block;
+.bingo-table {
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.bingo-table th,
+.bingo-table td {
   border: 2px solid #000;
-}
-
-.bingo-row {
-  display: flex;
-}
-
-.bingo-cell {
   width: 80px;
   height: 80px;
-  border: 1px solid #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .free-cell {
   background-color: lightgreen;
-  font-weight: bold;
+  color: #000;
 }

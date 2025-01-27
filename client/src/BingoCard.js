@@ -2,16 +2,28 @@ import React from 'react'
 import BingoCell from './BingoCell'
 
 function BingoCard ({ bingoGrid }) {
+  // We have a 5x5 array of strings in bingoGrid
+  const columns = ['B', 'I', 'N', 'G', 'O']
+
   return (
-    <div className='bingo-card'>
-      {bingoGrid.map((row, rowIndex) => (
-        <div key={rowIndex} className='bingo-row'>
-          {row.map((cell, colIndex) => (
-            <BingoCell key={colIndex} text={cell} />
+    <table className='bingo-table'>
+      <thead>
+        <tr>
+          {columns.map(col => (
+            <th key={col}>{col}</th>
           ))}
-        </div>
-      ))}
-    </div>
+        </tr>
+      </thead>
+      <tbody>
+        {bingoGrid.map((row, rowIndex) => (
+          <tr key={rowIndex}>
+            {row.map((cellText, colIndex) => (
+              <BingoCell key={colIndex} text={cellText} />
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
 
