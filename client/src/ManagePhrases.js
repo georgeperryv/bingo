@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react'
 
-/**
- * ManagePhrases:
- * - Displays all phrases (fetched from server) in a single list
- *   with checkboxes, text, Edit, and Delete.
- * - Allows adding new phrases.
- * - Allows editing and deleting existing phrases.
- * - Tracks which phrases are selected (up to 24).
- * - Calls onGenerate(selectedPhrases) in App when user wants to generate the Bingo card.
- */
 function ManagePhrases ({ onGenerate }) {
   const [phrases, setPhrases] = useState([])
   const [newPhraseText, setNewPhraseText] = useState('')
@@ -24,16 +15,17 @@ function ManagePhrases ({ onGenerate }) {
       const res = await fetch('/api/phrases')
       if (!res.ok) throw new Error('Failed to fetch phrases')
       const data = await res.json()
-      // We'll enhance each phrase object with a 'selected' property (false by default)
-      const phrasesWithSelected = data.map(p => ({ ...p, selected: false }))
-      setPhrases(phrasesWithSelected)
+      // We'll store a 'status' for each: 'in' | 'out' | 'maybe'
+      // For new loaded phrases, default is 'maybe'
+      const phrasesWithStatus = data.map(p => ({ ...p, status: 'maybe' }))
+      setPhrases(phrasesWithStatus)
     } catch (error) {
       console.error(error)
       alert('Unable to load phrases.')
     }
   }
 
-  // ----------- Adding a new phrase -----------
+  // ---------- ADD -----------
   const addPhrase = async () => {
     if (!newPhraseText.trim()) {
       alert('Please enter a phrase.')
@@ -50,8 +42,8 @@ function ManagePhrases ({ onGenerate }) {
         alert(error)
         return
       }
-      // phrase was successfully added, reload phrases from server
       setNewPhraseText('')
+      // reload from server
       await loadPhrases()
     } catch (error) {
       console.error(error)
@@ -59,7 +51,7 @@ function ManagePhrases ({ onGenerate }) {
     }
   }
 
-  // ----------- Editing an existing phrase -----------
+  // ---------- EDIT -----------
   const startEditing = phrase => {
     setEditId(phrase.id)
     setEditText(phrase.text)
@@ -86,7 +78,6 @@ function ManagePhrases ({ onGenerate }) {
         alert(error)
         return
       }
-      // success, reload phrases
       setEditId(null)
       setEditText('')
       await loadPhrases()
@@ -96,13 +87,9 @@ function ManagePhrases ({ onGenerate }) {
     }
   }
 
-  // ----------- Deleting a phrase -----------
+  // ---------- DELETE -----------
   const deletePhrase = async phraseId => {
-    const confirmDel = window.confirm(
-      'Are you sure you want to delete this phrase?'
-    )
-    if (!confirmDel) return
-
+    if (!window.confirm('Are you sure you want to delete this phrase?')) return
     try {
       const res = await fetch(`/api/phrases/${phraseId}`, {
         method: 'DELETE'
@@ -112,7 +99,6 @@ function ManagePhrases ({ onGenerate }) {
         alert(error)
         return
       }
-      // success, reload
       await loadPhrases()
     } catch (error) {
       console.error(error)
@@ -120,40 +106,37 @@ function ManagePhrases ({ onGenerate }) {
     }
   }
 
-  // ----------- Checkbox for selection -----------
-  const toggleSelection = phraseId => {
+  // ---------- STATUS CHECKBOXES -----------
+  // If user clicks green => status='in', red => status='out'
+  // Only one can be active; if green is clicked, red is unset, etc.
+  const setStatus = (phraseId, newStatus) => {
     setPhrases(prev =>
       prev.map(p => {
         if (p.id === phraseId) {
-          return { ...p, selected: !p.selected }
+          return { ...p, status: newStatus }
         }
         return p
       })
     )
   }
 
-  // Count how many are selected
-  const selectedCount = phrases.filter(p => p.selected).length
-
-  // 24 is the required count for Bingo
-  const canGenerate = selectedCount === 24
-
-  // Prepare list of selected phrase TEXTS for the Bingo card
-  const selectedPhrases = phrases.filter(p => p.selected).map(p => p.text)
-
+  // ---------- GENERATE BINGO CARD -----------
   const handleGenerateBingo = () => {
-    if (!canGenerate) {
-      alert(
-        'You must have exactly 24 selected phrases to generate a Bingo card!'
-      )
-      return
-    }
-    onGenerate(selectedPhrases)
+    // We'll gather phrases into 3 arrays:
+    // "include" => text of phrases with status='in'
+    // "exclude" => text of phrases with status='out'
+    // "maybe"   => text of phrases with status='maybe'
+    const include = phrases.filter(p => p.status === 'in').map(p => p.text)
+    const exclude = phrases.filter(p => p.status === 'out').map(p => p.text)
+    const maybe = phrases.filter(p => p.status === 'maybe').map(p => p.text)
+
+    // Pass to parent to call the server
+    onGenerate({ include, exclude, maybe })
   }
 
   return (
     <div className='manage-panel'>
-      <h2>Manage &amp; Select Phrases</h2>
+      <h2>Manage Phrases</h2>
 
       {/* Add new phrase */}
       <div className='add-phrase-row'>
@@ -166,41 +149,53 @@ function ManagePhrases ({ onGenerate }) {
         <button onClick={addPhrase}>Add</button>
       </div>
 
-      {/* Display phrases with checkbox, text, Edit, Delete */}
       <ul className='manage-phrase-list'>
         {phrases.map(phrase => {
           const isEditing = phrase.id === editId
           return (
             <li key={phrase.id} className='phrase-item-row'>
-              {/* Checkbox on the left */}
+              {/* Checkboxes for in/out */}
               <input
                 type='checkbox'
-                checked={phrase.selected}
+                // Green checkbox
+                style={{ accentColor: 'green' }}
+                checked={phrase.status === 'in'}
                 onChange={() => {
-                  // If we already have 24 selected and this is an attempt to check the 25th,
-                  // disallow it:
-                  if (!phrase.selected && selectedCount >= 24) {
-                    alert(
-                      'You already have 24 phrases selected. Uncheck one before selecting a new one.'
-                    )
-                    return
+                  if (phrase.status === 'in') {
+                    // toggling off sets to 'maybe'
+                    setStatus(phrase.id, 'maybe')
+                  } else {
+                    setStatus(phrase.id, 'in')
                   }
-                  toggleSelection(phrase.id)
+                }}
+              />
+              <input
+                type='checkbox'
+                // Red checkbox
+                style={{ accentColor: 'red' }}
+                checked={phrase.status === 'out'}
+                onChange={() => {
+                  if (phrase.status === 'out') {
+                    // toggling off sets to 'maybe'
+                    setStatus(phrase.id, 'maybe')
+                  } else {
+                    setStatus(phrase.id, 'out')
+                  }
                 }}
               />
 
-              {/* Phrase text or edit field */}
+              {/* Phrase text or input if editing */}
               {isEditing ? (
                 <input
                   type='text'
                   value={editText}
                   onChange={e => setEditText(e.target.value)}
+                  className='phrase-edit-input'
                 />
               ) : (
                 <span className='phrase-text'>{phrase.text}</span>
               )}
 
-              {/* Edit/Save/Cancel/Delete buttons */}
               {isEditing ? (
                 <>
                   <button onClick={() => saveEdit(phrase.id)}>Save</button>
@@ -219,12 +214,9 @@ function ManagePhrases ({ onGenerate }) {
         })}
       </ul>
 
-      {/* Show how many selected, and a button to generate Bingo if exactly 24 */}
-      <div className='selected-info'>
-        <p>{selectedCount} selected (24 required)</p>
-        <button onClick={handleGenerateBingo} disabled={!canGenerate}>
-          Generate Bingo Card
-        </button>
+      {/* Generate button */}
+      <div style={{ textAlign: 'right', marginTop: '10px' }}>
+        <button onClick={handleGenerateBingo}>Generate Bingo Card</button>
       </div>
     </div>
   )

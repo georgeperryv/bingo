@@ -2,9 +2,7 @@ import React from 'react'
 import BingoCell from './BingoCell'
 
 function BingoCard ({ bingoGrid }) {
-  // We have a 5x5 array of strings in bingoGrid
   const columns = ['B', 'I', 'N', 'G', 'O']
-
   return (
     <table className='bingo-table'>
       <thead>

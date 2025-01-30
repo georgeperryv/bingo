@@ -26,7 +26,7 @@ function savePhrases (phrases) {
 app.get('/api/phrases', (req, res) => {
   try {
     const phrases = loadPhrases()
-    res.json(phrases)
+    res.json(phrases) // e.g. [{ id: 1, text: "..." }, ...]
   } catch (error) {
     console.error('Failed to load phrases:', error)
     res.status(500).json({ error: 'Unable to load phrases' })
@@ -96,28 +96,83 @@ app.delete('/api/phrases/:id', (req, res) => {
   }
 })
 
-// 5) Generate Bingo Card from 24 selected phrases
+/**
+ * 5) Generate Bingo Card
+ *    Receives:
+ *    {
+ *      "include": ["Forced phrase A", ...],
+ *      "exclude": ["Forced out phrase B", ...],
+ *      "maybe":   ["Maybe phrase C", ...]
+ *    }
+ *
+ *    Must generate a 5x5 grid with:
+ *      - All "include" phrases
+ *      - Enough "maybe" phrases to reach total of 24 (center is FREE)
+ *      - No "exclude" phrases
+ */
 app.post('/api/generate', (req, res) => {
-  const { selectedPhrases } = req.body // array of EXACTLY 24 strings
-  if (!Array.isArray(selectedPhrases) || selectedPhrases.length !== 24) {
-    return res
-      .status(400)
-      .json({ error: 'Exactly 24 phrases must be selected.' })
+  const { include, exclude, maybe } = req.body
+
+  // Basic validation
+  if (
+    !Array.isArray(include) ||
+    !Array.isArray(exclude) ||
+    !Array.isArray(maybe)
+  ) {
+    return res.status(400).json({ error: 'Invalid request data.' })
   }
 
-  // Shuffle selected phrases
-  const shuffled = shuffleArray(selectedPhrases)
+  // If too many forced includes
+  if (include.length > 24) {
+    return res
+      .status(400)
+      .json({ error: 'You have more than 24 forced-in phrases!' })
+  }
 
-  // Build 5x5 with "FREE" in center
+  // We'll fill the card with all `include` + some from `maybe`.
+  const forcedIn = [...include] // definitely in
+  const forcedOut = [...exclude] // definitely not in
+  const pool = [...maybe] // maybe pool
+
+  // We want exactly 24 total (not counting the FREE center).
+  // So we already have forcedIn.length. We need the difference from the maybe pool.
+  const needed = 24 - forcedIn.length
+
+  if (needed < 0) {
+    return res
+      .status(400)
+      .json({ error: 'Too many forced-in phrases. Max is 24.' })
+  }
+
+  if (needed > pool.length) {
+    return res.status(400).json({
+      error: 'Not enough "maybe" phrases to fill the required 24.'
+    })
+  }
+
+  // Shuffle the maybe pool
+  shuffleArray(pool)
+
+  // Select the needed portion from the maybe pool
+  const selectedFromMaybe = pool.slice(0, needed)
+
+  // Combine forcedIn + selectedFromMaybe
+  const finalPhrases = [...forcedIn, ...selectedFromMaybe]
+
+  // Now we have exactly 24 phrases in finalPhrases. Let's shuffle them for random placement
+  shuffleArray(finalPhrases)
+
+  // Construct the 5x5 grid with FREE in the center
   const bingoGrid = []
   let index = 0
   for (let row = 0; row < 5; row++) {
     const rowArray = []
     for (let col = 0; col < 5; col++) {
       if (row === 2 && col === 2) {
+        // Center
         rowArray.push('FREE')
       } else {
-        rowArray.push(shuffled[index])
+        rowArray.push(finalPhrases[index])
         index++
       }
     }
@@ -127,17 +182,14 @@ app.post('/api/generate', (req, res) => {
   return res.json({ bingoGrid })
 })
 
-// Helper: shuffle array
+// Helper: shuffle in-place
 function shuffleArray (array) {
-  const arr = [...array]
-  for (let i = arr.length - 1; i > 0; i--) {
+  for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    ;[array[i], array[j]] = [array[j], array[i]]
   }
-  return arr
 }
 
-// Start server
 const PORT = process.env.PORT || 4000
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`)
