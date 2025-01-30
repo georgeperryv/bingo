@@ -184,8 +184,9 @@ h1 {
 /* Table layout */
 .bingo-table {
   border-collapse: collapse;
-  margin: 0 auto; /* center the table */
-  margin-bottom: 20px;
+  margin: 0 auto 20px; /* center the table, add bottom margin */
+  width: 500px; /* 5 columns * 100px each = 500px total width */
+  table-layout: fixed; /* prevents columns from auto-resizing */
 }
 
 /* Square cells: 100x100. We ensure text shrinks if it's too long. */
@@ -199,32 +200,35 @@ h1 {
   position: relative;
   text-align: center;
   padding: 0 5px; /* smaller horizontal padding */
+  overflow: hidden; /* ensures no vertical expansion */
 }
 
-/* Make normal squares white */
+/* BINGO header row - bigger font */
+.bingo-table th {
+  background-color: #add8e6;
+  font-size: 1.4rem; /* << Increase for bigger "B I N G O" */
+}
+
+/* Make normal squares smaller text & white background */
 .bingo-table td {
   background-color: #fff;
 }
 
-/* Light blue header for BINGO columns */
-.bingo-table th {
-  background-color: #add8e6;
-}
-
 /* FREE cell -> same shade of blue as the header */
 .free-cell {
-  background-color: #add8e6;
+  background-color: #add8e6 !important;
   color: #000;
   font-weight: bold;
 }
 
 /* If phrase is too long, shrink the font to fit. Wrap if needed. */
+/* Decrease the upper limit to keep it smaller. Adjust min as desired. */
 .bingo-cell span {
   display: inline-block;
   width: 100%;
   text-align: center;
   line-height: 1.2;
-  font-size: clamp(10px, 2vw, 16px);
+  font-size: clamp(6px, 1.5vw, 14px); /* smaller than before */
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;

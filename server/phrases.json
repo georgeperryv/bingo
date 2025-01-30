@@ -8,10 +8,6 @@
     "text": "d"
   },
   {
-    "id": 9,
-    "text": "e"
-  },
-  {
     "id": 10,
     "text": "f"
   },
@@ -26,14 +22,6 @@
   {
     "id": 15,
     "text": "k"
-  },
-  {
-    "id": 16,
-    "text": "l"
-  },
-  {
-    "id": 17,
-    "text": "m"
   },
   {
     "id": 18,
@@ -88,10 +76,6 @@
     "text": "hi"
   },
   {
-    "id": 33,
-    "text": "Patrick mahomes goes for a run but then gets touched with one finger and a penalty flag is thrown by the refs who are obviously trying to get them to the super bowl because of travis kelce"
-  },
-  {
     "id": 34,
     "text": "asdf"
   },
@@ -102,5 +86,29 @@
   {
     "id": 37,
     "text": "new phrase"
+  },
+  {
+    "id": 38,
+    "text": "hello"
+  },
+  {
+    "id": 39,
+    "text": "anotha"
+  },
+  {
+    "id": 40,
+    "text": "Eagles score TD in overtime"
+  },
+  {
+    "id": 41,
+    "text": "Interception"
+  },
+  {
+    "id": 42,
+    "text": "Doritos commercial where they say \"yum\""
+  },
+  {
+    "id": 43,
+    "text": "fumble recovery by chiefs"
   }
 ]
