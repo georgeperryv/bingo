@@ -6,93 +6,226 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* Container for the entire app */
 .container {
   width: 80%;
   margin: 20px auto;
   padding: 20px;
 }
 
-/* 2) Top-level heading */
+/* Top-level heading */
 h1 {
   text-align: center;
   margin-bottom: 30px;
 }
 
-/* 3) Manage Phrases Panel */
+/* 2) Manage Phrases Panel */
 .manage-panel {
   border: 1px solid #ccc;
   background-color: #fff;
   padding: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 40px; /* More vertical spacing before the bingo card */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Adds a nice shadow */
+  position: relative;
 }
 
 .manage-panel h2 {
   margin-top: 0;
+  margin-bottom: 15px;
 }
 
+/* Row for adding a new phrase */
 .add-phrase-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 15px; /* More vertical space */
 }
-
 .add-phrase-row input {
   flex: 1;
 }
 
-.manage-phrase-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
+/* Instructions text, centered */
+.phrase-explanation {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px; /* extra spacing */
+  line-height: 1.4;
 }
 
+/* Header row for columns:
+     col-number, col-include, col-exclude, col-phrase */
+.phrase-header-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* extra spacing */
+  font-weight: bold;
+  text-align: center;
+}
+
+.col-number {
+  width: 40px;
+  text-align: center;
+}
+
+.col-include {
+  width: 80px;
+  text-align: center;
+}
+
+.col-exclude {
+  width: 80px;
+  text-align: center;
+}
+
+.col-phrase {
+  flex: 1;
+  text-align: center; /* center the "Phrase" header only */
+}
+
+/* Phrases list container */
+.manage-phrase-list {
+  margin: 0;
+  padding: 0;
+}
+
+/* Each phrase row */
 .phrase-item-row {
   display: flex;
   align-items: center;
+  padding: 8px 0; /* vertical padding for each row */
+}
+
+/* Faint grey line between items (not last) */
+.phrase-item-row:not(:last-child) {
+  border-bottom: 1px solid #ccc;
+}
+
+/* The left column for dynamic numbering */
+.col-number {
+  width: 40px;
+  text-align: center;
+}
+
+/* The checkbox columns */
+.col-include {
+  width: 80px;
+  text-align: center;
+}
+
+.col-exclude {
+  width: 80px;
+  text-align: center;
+}
+
+/* For each phrase row, the final col-phrase is split horizontally
+     between "phrase-left" (text) and "phrase-actions" (edit/delete) */
+.col-phrase {
+  flex: 1;
+  /* The actual phrase text in rows is left-aligned, 
+       even though the header is centered. */
+}
+
+.phrase-row-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.phrase-left {
+  display: flex;
+  align-items: center;
+  text-align: left; /* ensure phrase text is left-aligned */
+}
+
+/* Edit/Delete on the far right */
+.phrase-actions {
+  margin-left: auto;
+  display: flex;
   gap: 10px;
-  margin-bottom: 6px;
 }
 
 .phrase-edit-input {
-  flex: 1;
+  width: 200px;
+  margin-right: 5px;
 }
 
 .phrase-text {
-  flex: 1;
   display: inline-block;
+  margin-right: 5px;
 }
 
-/* 4) Bingo Card Panel */
-.bingo-panel {
+/* Larger, light blue Generate button */
+.generate-button-container {
   margin-top: 20px;
   text-align: center;
 }
 
+.generate-button {
+  background-color: #add8e6;
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+.generate-button:hover {
+  background-color: #9ec5d2; /* slightly darker on hover */
+}
+
+/* 3) Bingo Card Panel */
+.bingo-panel {
+  margin-top: 0px; /* We already gave 40px margin-bottom on manage-panel */
+  text-align: center;
+}
+
+/* Table layout */
 .bingo-table {
   border-collapse: collapse;
   margin: 0 auto; /* center the table */
   margin-bottom: 20px;
 }
 
+/* Square cells: 100x100. We ensure text shrinks if it's too long. */
 .bingo-table th,
 .bingo-table td {
   border: 2px solid #000;
-  width: 80px;
-  height: 80px;
-  text-align: center;
+  width: 100px;
+  height: 100px;
   vertical-align: middle;
   font-weight: bold;
-  font-size: 16px;
+  position: relative;
+  text-align: center;
+  padding: 0 5px; /* smaller horizontal padding */
 }
 
-/* Light blue header */
+/* Make normal squares white */
+.bingo-table td {
+  background-color: #fff;
+}
+
+/* Light blue header for BINGO columns */
 .bingo-table th {
-  background-color: #add8e6; /* light blue */
+  background-color: #add8e6;
 }
 
+/* FREE cell -> same shade of blue as the header */
 .free-cell {
-  background-color: lightgreen;
+  background-color: #add8e6;
   color: #000;
   font-weight: bold;
+}
+
+/* If phrase is too long, shrink the font to fit. Wrap if needed. */
+.bingo-cell span {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  line-height: 1.2;
+  font-size: clamp(10px, 2vw, 16px);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }

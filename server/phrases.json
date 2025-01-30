@@ -1,13 +1,5 @@
 [
   {
-    "id": 5,
-    "text": "a"
-  },
-  {
-    "id": 6,
-    "text": "b"
-  },
-  {
     "id": 7,
     "text": "c"
   },
@@ -26,14 +18,6 @@
   {
     "id": 11,
     "text": "g"
-  },
-  {
-    "id": 12,
-    "text": "h"
-  },
-  {
-    "id": 13,
-    "text": "i"
   },
   {
     "id": 14,
@@ -72,12 +56,8 @@
     "text": "r"
   },
   {
-    "id": 23,
-    "text": "s"
-  },
-  {
     "id": 24,
-    "text": "t"
+    "text": "t0]"
   },
   {
     "id": 25,
@@ -110,5 +90,17 @@
   {
     "id": 33,
     "text": "Patrick mahomes goes for a run but then gets touched with one finger and a penalty flag is thrown by the refs who are obviously trying to get them to the super bowl because of travis kelce"
+  },
+  {
+    "id": 34,
+    "text": "asdf"
+  },
+  {
+    "id": 36,
+    "text": "anotha"
+  },
+  {
+    "id": 37,
+    "text": "new phrase"
   }
 ]
