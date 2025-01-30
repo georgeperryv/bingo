@@ -190,6 +190,14 @@ function shuffleArray (array) {
   }
 }
 
+// 1) Serve static files from client/build
+app.use(express.static(path.join(__dirname, 'client', 'build')))
+
+// 2) Catch-all route: send index.html for any other request
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'))
+})
+
 const PORT = process.env.PORT || 4000
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`)
