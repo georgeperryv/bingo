@@ -1,0 +1,15 @@
+# Node modules in the root folder
+/node_modules
+
+# Node modules in the React client folder
+/client/node_modules
+
+# Production build folder (if you don't want to commit the built files)
+client/build
+
+# Logs and environment files
+*.log
+.env
+
+# Optional: DS_Store for macOS
+.DS_Store
